@@ -8,6 +8,7 @@ import JobPublishAction from "./_components/jobs-publish-actions";
 import Banner from "@/components/banner";
 import { IconBadge } from "@/components/icon-badge";
 import TitleForm from "./_components/title-form";
+import CategoryForm from "./_components/category-form";
 
 const JobDetailsPage = async ({ params }: { params: { jobId: string } }) => {
   const validObjectIdRegex = /^[0-9a-fA-F]{24}$/;
@@ -25,12 +26,22 @@ const JobDetailsPage = async ({ params }: { params: { jobId: string } }) => {
       userId,
     },
   });
+  const categories = await db.category.findMany({
+    orderBy: {
+      name: "asc",
+    },
+  });
 
   if (!job) {
     return redirect("/admin/jobs");
   }
 
-  const requiredFields = [job.title, job.description, job.imageUrl];
+  const requiredFields = [
+    job.title,
+    job.description,
+    job.imageUrl,
+    job.categoryId,
+  ];
   const totalFields = requiredFields.length;
   const completedFields = requiredFields.filter(Boolean).length;
   const completionText = `${completedFields}/${totalFields} fields completed`;
@@ -70,6 +81,15 @@ const JobDetailsPage = async ({ params }: { params: { jobId: string } }) => {
           {/* title form */}
           <div>
             <TitleForm initialData={job} jobId={job.id} />
+            {/* category form */}
+            <CategoryForm
+              initialData={job}
+              jobId={job.id}
+              options={categories.map((category) => ({
+                label: category.name,
+                value: category.id,
+              }))}
+            />
           </div>
         </div>
       </div>

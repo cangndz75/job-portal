@@ -1,5 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
+import { Combobox } from "@/components/ui/combo-box";
 import {
   Form,
   FormControl,
@@ -8,7 +9,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Job } from "@prisma/client";
 import axios from "axios";
 import { Pencil } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -17,43 +20,46 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { z } from "zod";
-interface TitleFormProps {
-  initialData: {
-    title: string;
-  };
+interface CategoryFormProps {
+  initialData: Job;
   jobId: string;
+  options: { label: string; value: string }[];
 }
 
 const formSchema = z.object({
-  title: z.string().min(1, { message: "Title is required" }),
+  categoryId: z.string().min(1),
 });
 
-const TitleForm = ({ initialData, jobId }: TitleFormProps) => {
+const CategoryForm = ({ initialData, jobId, options }: CategoryFormProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: initialData,
+    defaultValues: {
+      categoryId: initialData.categoryId || "",
+    },
   });
   const { isSubmitting, isValid } = form.formState;
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-        const response = await axios.patch(`/api/jobs/${jobId}`, values);
-        toast.success("Job title updated");
-        toggleEditting();
-        router.refresh();
+      const response = await axios.patch(`/api/jobs/${jobId}`, values);
+      toast.success("Job category updated");
+      toggleEditting();
+      router.refresh();
     } catch (error) {
-        toast.error("Failed to update job title");
+      toast.error("Failed to update job category");
     }
   };
 
   const toggleEditting = () => setIsEditing((current) => !current);
-
+  const selectedOption = options.find(
+    (option) => option.value === initialData.categoryId
+  );
   return (
     <div className="mt-6 border bg-neutral-100 rounded-md p-4">
       <div className="font-medium flex items-center justify-between">
-        Job Title
+        Job Category
         <Button onClick={toggleEditting} variant={"ghost"}>
           {isEditing ? (
             <>Cancel</>
@@ -64,7 +70,16 @@ const TitleForm = ({ initialData, jobId }: TitleFormProps) => {
           )}
         </Button>
       </div>
-      {!isEditing && <p className="text-sm mt-2">{initialData.title}</p>}
+      {!isEditing && (
+        <p
+          className={cn(
+            "text-sm mt-2",
+            !initialData?.categoryId && "text-neutral-500 italic"
+          )}
+        >
+          {selectedOption?.label || "No category"}
+        </p>
+      )}
 
       {isEditing && (
         <Form {...form}>
@@ -74,13 +89,13 @@ const TitleForm = ({ initialData, jobId }: TitleFormProps) => {
           >
             <FormField
               control={form.control}
-              name="title"
+              name="categoryId"
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input
-                      disabled={isSubmitting}
-                      placeholder="e.g 'Full-Stack developer'"
+                    <Combobox
+                      heading="Categories"
+                      options={options}
                       {...field}
                     />
                   </FormControl>
@@ -100,4 +115,4 @@ const TitleForm = ({ initialData, jobId }: TitleFormProps) => {
   );
 };
 
-export default TitleForm;
+export default CategoryForm;
