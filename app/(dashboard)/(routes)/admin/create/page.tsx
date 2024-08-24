@@ -16,6 +16,8 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import axios from "axios";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 const formSchema = z.object({
   title: z.string().min(1, { message: "Please enter a title" }),
 });
@@ -29,10 +31,12 @@ const JobCreatePage = () => {
   });
 
   const {isSubmitting, isValid} = form.formState;
+  const router = useRouter();
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       const response = await axios.post("/api/jobs", values);
-      console.log(response);
+      router.push(`/admin/jobs/${response.data.id}`);
+      toast.success("Job created successfully");
     } catch (error) {
       console.log((error as Error)?.message);
     }
@@ -69,7 +73,7 @@ const JobCreatePage = () => {
               )}
             />
             <div className="flex items-center gap-x-2">
-              <Link href={"/"}>
+              <Link href={"/admin/jobs"}>
                 <Button type="button" variant={"ghost"}>
                   Cancel
                 </Button>
