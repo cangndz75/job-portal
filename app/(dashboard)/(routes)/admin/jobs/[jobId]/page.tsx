@@ -1,11 +1,13 @@
 import { db } from "@/lib/db";
 import { auth } from "@clerk/nextjs/server";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, LayoutDashboard } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import React from "react";
 import JobPublishAction from "./_components/jobs-publish-actions";
-import Banner from "@/components/ui/banner";
+import Banner from "@/components/banner";
+import { IconBadge } from "@/components/icon-badge";
+import TitleForm from "./_components/title-form";
 
 const JobDetailsPage = async ({ params }: { params: { jobId: string } }) => {
   const validObjectIdRegex = /^[0-9a-fA-F]{24}$/;
@@ -53,9 +55,24 @@ const JobDetailsPage = async ({ params }: { params: { jobId: string } }) => {
           isPublished={job.isPublished}
         />
       </div>
-      {!job.isPublished &&(
+      {!job.isPublished && (
         <Banner variant={"warning"} label="This job is not published" />
-      )} 
+      )}
+
+      {/* Container Layout */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-16">
+        <div>
+          {/*title */}
+          <div className="flex items-center gap-x-2">
+            <IconBadge icon={LayoutDashboard} />
+            <h2 className="text-xl text-neutral-700">Customize your job</h2>
+          </div>
+          {/* title form */}
+          <div>
+            <TitleForm initialData={job} jobId={job.id} />
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
