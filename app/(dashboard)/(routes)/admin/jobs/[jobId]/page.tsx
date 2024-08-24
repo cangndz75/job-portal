@@ -10,6 +10,11 @@ import { IconBadge } from "@/components/icon-badge";
 import TitleForm from "./_components/title-form";
 import CategoryForm from "./_components/category-form";
 import ImageForm from "./_components/image-form";
+import ShortDescription from "./_components/short-description";
+import ShiftTimingForm from "./_components/shift-timing-mode";
+import HourlyRateForm from "./_components/hourly-rate-form";
+import JobModeForm from "./_components/job-mode-form";
+import YearsOfExperienceForm from "./_components/work-experience-form";
 
 const JobDetailsPage = async ({ params }: { params: { jobId: string } }) => {
   const validObjectIdRegex = /^[0-9a-fA-F]{24}$/;
@@ -94,6 +99,21 @@ const JobDetailsPage = async ({ params }: { params: { jobId: string } }) => {
 
             {/* cover image*/}
             <ImageForm initialData={job} jobId={job.id} />
+
+            {/* short description */}
+            <ShortDescription initialData={job} jobId={job.id} />
+
+            {/* shift timing */}
+            <ShiftTimingForm initialData={job} jobId={job.id} />
+
+            {/* hourly rate */}
+            <HourlyRateForm initialData={job} jobId={job.id} />
+
+            {/* job mode */}
+            <JobModeForm initialData={job} jobId={job.id} />
+
+            {/* work experience */}
+            <YearsOfExperienceForm initialData={job} jobId={job.id} />
           </div>
         </div>
       </div>
