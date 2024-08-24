@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Job } from "@prisma/client";
 import axios from "axios";
 import { ImageIcon, Pencil } from "lucide-react";
 import Image from "next/image";
@@ -19,9 +20,7 @@ import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { z } from "zod";
 interface ImageFormProps {
-  initialData: {
-    imageUrl: string;
-  };
+  initialData: Job,
   jobId: string;
 }
 
