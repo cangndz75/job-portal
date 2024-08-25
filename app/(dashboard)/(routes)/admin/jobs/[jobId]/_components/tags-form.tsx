@@ -42,11 +42,11 @@ const TagsForm = ({ initialData, jobId }: TagsFormProps) => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       const response = await axios.patch(`/api/jobs/${jobId}`, values);
-      toast.success("Job short description updated successfully");
+      toast.success("Job tags updated successfully");
       toggleEditting();
       router.refresh();
     } catch (error) {
-      toast.error("Failed to update job short description");
+      toast.error("Failed to update job tags");
     }
   };
 
