@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { auth } from "@clerk/nextjs/server";
-import { ArrowLeft, LayoutDashboard } from "lucide-react";
+import { ArrowLeft, LayoutDashboard, ListChecks } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import React from "react";
@@ -16,6 +16,7 @@ import HourlyRateForm from "./_components/hourly-rate-form";
 import JobModeForm from "./_components/job-mode-form";
 import YearsOfExperienceForm from "./_components/work-experience-form";
 import JobDescription from "./_components/job-description";
+import TagsForm from "./_components/tags-form";
 
 const JobDetailsPage = async ({ params }: { params: { jobId: string } }) => {
   const validObjectIdRegex = /^[0-9a-fA-F]{24}$/;
@@ -119,6 +120,15 @@ const JobDetailsPage = async ({ params }: { params: { jobId: string } }) => {
         </div>
 
         {/* Right Container */}
+        <div className="space-y-6">
+          <div>
+            <div className="flex items-center gap-x-2">
+              <IconBadge icon={ListChecks} />
+              <h2 className="text-xl text-neutral-700">Job Requirements</h2>
+            </div>
+            <TagsForm initialData={job} jobId={job.id} />
+          </div>
+        </div>
 
         {/* Description */}
         <div className="col-span-2">
