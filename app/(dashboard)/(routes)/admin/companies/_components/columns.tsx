@@ -22,6 +22,22 @@ export const columns: ColumnDef<CompanyColumns>[] = [
   {
     accessorKey: "logo",
     header: "Logo",
+    cell: ({ row }) => {
+      const logoUrl = row.original.logo;
+      return (
+        <div className="flex items-center justify-center">
+          {logoUrl ? (
+            <img
+              src={logoUrl}
+              alt="Company Logo"
+              className="h-12 w-12 object-cover"
+            />
+          ) : (
+            "No Logo"
+          )}
+        </div>
+      );
+    },
   },
   {
     accessorKey: "name",

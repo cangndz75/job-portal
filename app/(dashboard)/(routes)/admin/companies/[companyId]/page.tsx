@@ -8,6 +8,7 @@ import { redirect } from "next/navigation";
 import React from "react";
 import CompanyName from "./name-form";
 import CompanyDescriptionForm from "./description-form";
+import CompanyLogoForm from "./logo-form";
 
 const CompanyEditPage = async ({
   params,
@@ -82,6 +83,7 @@ const CompanyEditPage = async ({
           </div>
           <CompanyName initialData={company} companyId={company.id} />
           <CompanyDescriptionForm initialData={company} companyId={company.id} />
+          <CompanyLogoForm initialData={company} companyId={company.id} />
         </div>
         {/* Right Container */}
         <div className="space-y-6"></div>

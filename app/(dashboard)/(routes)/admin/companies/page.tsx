@@ -27,7 +27,7 @@ const CompaniesOverviewPage = async () => {
   const formattedCompanies: CompanyColumns[] = companies.map((company) => ({
     id: company.id,
     name: company.name ? company.name : "No name",
-    logo: company.logo ? company.logo : "No logo",
+    logo: company.logo ? company.logo : "",
     createdAt: company.createdAt
       ? format(new Date(company.createdAt), "MMMM do, yyyy")
       : "N/A",
