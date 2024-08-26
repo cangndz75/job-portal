@@ -2,13 +2,14 @@ import Banner from "@/components/banner";
 import { IconBadge } from "@/components/icon-badge";
 import { db } from "@/lib/db";
 import { auth } from "@clerk/nextjs/server";
-import { ArrowLeft, LayoutDashboard, ListChecks } from "lucide-react";
+import { ArrowLeft, LayoutDashboard, ListChecks, Network } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import React from "react";
 import CompanyName from "./name-form";
 import CompanyDescriptionForm from "./description-form";
 import CompanyLogoForm from "./logo-form";
+import CompanySocialContactsForm from "./social-contacts-form";
 
 const CompanyEditPage = async ({
   params,
@@ -86,7 +87,15 @@ const CompanyEditPage = async ({
           <CompanyLogoForm initialData={company} companyId={company.id} />
         </div>
         {/* Right Container */}
-        <div className="space-y-6"></div>
+        <div className="space-y-6">
+          <div>
+            <div className="flex items-center gap-x-2">
+              <IconBadge icon={Network} />
+              <h2 className="text-xl text-neutral-700">Company Social Contacts</h2>
+            </div>
+            <CompanySocialContactsForm initialData={company} companyId={company.id} />
+          </div>
+        </div>
       </div>
     </div>
   );
