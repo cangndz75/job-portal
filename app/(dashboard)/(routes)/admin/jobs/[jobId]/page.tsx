@@ -17,6 +17,7 @@ import JobModeForm from "./_components/job-mode-form";
 import YearsOfExperienceForm from "./_components/work-experience-form";
 import JobDescription from "./_components/job-description";
 import TagsForm from "./_components/tags-form";
+import CompanyForm from "./_components/company-form";
 
 const JobDetailsPage = async ({ params }: { params: { jobId: string } }) => {
   const validObjectIdRegex = /^[0-9a-fA-F]{24}$/;
@@ -37,6 +38,15 @@ const JobDetailsPage = async ({ params }: { params: { jobId: string } }) => {
   const categories = await db.category.findMany({
     orderBy: {
       name: "asc",
+    },
+  });
+
+  const companies = await db.company.findMany({
+    where: {
+      userId,
+    },
+    orderBy: {
+      createdAt: "desc",
     },
   });
 
@@ -127,6 +137,15 @@ const JobDetailsPage = async ({ params }: { params: { jobId: string } }) => {
               <h2 className="text-xl text-neutral-700">Job Requirements</h2>
             </div>
             <TagsForm initialData={job} jobId={job.id} />
+            {/* company form */}
+            <CompanyForm
+              initialData={job}
+              jobId={job.id}
+              options={companies.map((company) => ({
+                label: company.name,
+                value: company.id,
+              }))}
+            />
           </div>
         </div>
 
