@@ -1,6 +1,12 @@
 import { db } from "@/lib/db";
 import { auth } from "@clerk/nextjs/server";
-import { ArrowLeft, LayoutDashboard, ListChecks } from "lucide-react";
+import {
+  ArrowLeft,
+  Building2,
+  File,
+  LayoutDashboard,
+  ListChecks,
+} from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import React from "react";
@@ -137,6 +143,12 @@ const JobDetailsPage = async ({ params }: { params: { jobId: string } }) => {
               <h2 className="text-xl text-neutral-700">Job Requirements</h2>
             </div>
             <TagsForm initialData={job} jobId={job.id} />
+          </div>
+          <div>
+            <div className="flex items-center gap-x-2">
+              <IconBadge icon={Building2} />
+              <h2 className="text-xl text-neutral-700">Company Details</h2>
+            </div>
             {/* company form */}
             <CompanyForm
               initialData={job}
@@ -146,6 +158,13 @@ const JobDetailsPage = async ({ params }: { params: { jobId: string } }) => {
                 value: company.id,
               }))}
             />
+          </div>
+          {/* attachements */}
+          <div>
+            <div className="flex items-center gap-x-2">
+              <IconBadge icon={File} />
+              <h2 className="text-xl text-neutral-700">Job Attachments</h2>
+            </div>
           </div>
         </div>
 
