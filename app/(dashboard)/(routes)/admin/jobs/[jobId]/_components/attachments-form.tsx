@@ -102,7 +102,9 @@ const AttachmentsForm = ({ initialData, jobId }: AttachmentsFormProps) => {
                     <AttachmentsUploads
                       value={field.value}
                       disabled={isSubmitting}
-                      onChange={(url) => field.onChange(url)}
+                      onChange={(attachments) => {
+                        field.onChange(attachments.map((item) => item))
+                      }}
                       onRemove={() => field.onChange("")}
                     />
                   </FormControl>
