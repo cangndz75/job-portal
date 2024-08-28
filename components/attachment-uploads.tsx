@@ -7,7 +7,7 @@ import {
   ref,
   uploadBytesResumable,
 } from "firebase/storage";
-import { FilePlus, ImagePlus, Trash } from "lucide-react";
+import { File, FilePlus, ImagePlus, Trash } from "lucide-react";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -79,7 +79,6 @@ const AttachmentsUploads = ({
             </>
           ) : (
             <>
-              {" "}
               <label>
                 <div className="flex gap-2 items-center justify-center cursor-pointer">
                   <FilePlus className="w-3 h-3 mr-2" />
@@ -96,7 +95,23 @@ const AttachmentsUploads = ({
           )}
         </div>
         <div className="flex-col">
-          {value && value.length > 0 ? <>{}</> : <p>No attachments</p>}
+          {value && value.length > 0 ? (
+            <>
+              <div className="space-y-2">
+                {value.map((item) => (
+                  <div
+                    className="flex items-center p-3 w-full bg-purple-100 border-purple-200 border text-purple-700 rounded-md"
+                    key={item.url}
+                  >
+                    <File className="w-4 h-4 mr-2" />
+                    <p className="text-ws w-full truncate">{item.name} </p>
+                  </div>
+                ))}
+              </div>
+            </>
+          ) : (
+            <p>No attachments</p>
+          )}
         </div>
       </div>
     );
