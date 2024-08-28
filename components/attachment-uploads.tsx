@@ -36,30 +36,71 @@ const AttachmentsUploads = ({
   if (!isMounted) return null;
 
   const onUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-   
-  };
+    const files: File[] = Array.from(e.target.files || []);
+    setIsLoading(true);
+    const newUrls: { url: string; name: string }[] = [];
+    let completedFiles = 0;
+    files.forEach((file: File) => {
+      const uploadTask = uploadBytesResumable(
+        ref(storage, `Attachments/${Date.now()}-${file?.name}`),
+        file,
+        { contentType: file?.type }
+      );
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          setProgress((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+        },
+        (error) => {
+          toast.error(error.message);
+        },
+        () => {
+          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+            newUrls.push({ url: downloadURL, name: file.name });
+            completedFiles++;
+            if (completedFiles === files.length) {
+              onChange([...value, ...newUrls]);
+              setIsLoading(false);
+              toast.success("Attachments uploaded successfully");
+            }
+          });
+        }
+      );
+    });
 
-  const onDelete = () => {};
+    const onDelete = () => {};
 
-  return (
-    <div>
-      <label>
-        <div className="flex gap-2 items-center justify-center cursor-pointer">
-          <FilePlus className="w-3 h-3 mr-2" />
-          <p>Add a file</p>
+    return (
+      <div>
+        <div className="w-full p-2 flex items-center justify-end">
+          {isLoading ? (
+            <>
+              <p>{`${progress.toFixed(2)}%`}</p>
+            </>
+          ) : (
+            <>
+              {" "}
+              <label>
+                <div className="flex gap-2 items-center justify-center cursor-pointer">
+                  <FilePlus className="w-3 h-3 mr-2" />
+                  <p>Add a file</p>
+                </div>
+                <input
+                  type="file"
+                  accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
+                  className="w-0 h-0"
+                  onChange={onUpload}
+                />
+              </label>
+            </>
+          )}
         </div>
-        <input
-          type="file"
-          accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
-          className="w-0 h-0"
-          onChange={onUpload}
-        />
-      </label>
-      <div className="flex-col">
-        {value && value.length > 0 ? <>{}</> : <p>No attachments</p>}
+        <div className="flex-col">
+          {value && value.length > 0 ? <>{}</> : <p>No attachments</p>}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 };
 
 export default AttachmentsUploads;
