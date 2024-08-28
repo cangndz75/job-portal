@@ -15,9 +15,9 @@ import { Button } from "./ui/button";
 
 interface AttachmentsUploadsProps {
   disabled?: boolean;
-  onChange: (value: {url:string, name:string}[]) => void;
+  onChange: (value: { url: string; name: string }[]) => void;
   onRemove: (value: string) => void;
-  value: {url:string, name:string}[];
+  value: { url: string; name: string }[];
 }
 const AttachmentsUploads = ({
   disabled,
@@ -36,35 +36,28 @@ const AttachmentsUploads = ({
   if (!isMounted) return null;
 
   const onUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files) return;
-    const file: File = e.target.files[0];
-    setIsLoading(true);
-    const uploadTask = uploadBytesResumable(
-      ref(storage, `JobCoverImage/${Date.now()}-${file?.name}`),
-      file,
-      { contentType: file?.type }
-    );
-    uploadTask.on(
-      "state_changed",
-      (snapshot) => {
-        setProgress((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-      },
-      (error) => {
-        toast.error(error.message);
-      },
-      () => {
-        
-      }
-    );
+   
   };
 
-  const onDelete = () => {
-    
-  };
+  const onDelete = () => {};
 
   return (
     <div>
-      
+      <label>
+        <div className="flex gap-2 items-center justify-center cursor-pointer">
+          <FilePlus className="w-3 h-3 mr-2" />
+          <p>Add a file</p>
+        </div>
+        <input
+          type="file"
+          accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
+          className="w-0 h-0"
+          onChange={onUpload}
+        />
+      </label>
+      <div className="flex-col">
+        {value && value.length > 0 ? <>{}</> : <p>No attachments</p>}
+      </div>
     </div>
   );
 };
