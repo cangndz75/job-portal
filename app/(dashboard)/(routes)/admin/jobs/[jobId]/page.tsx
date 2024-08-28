@@ -24,6 +24,7 @@ import YearsOfExperienceForm from "./_components/work-experience-form";
 import JobDescription from "./_components/job-description";
 import TagsForm from "./_components/tags-form";
 import CompanyForm from "./_components/company-form";
+import AttachmentsForm from "./_components/attachments-form";
 
 const JobDetailsPage = async ({ params }: { params: { jobId: string } }) => {
   const validObjectIdRegex = /^[0-9a-fA-F]{24}$/;
@@ -165,6 +166,7 @@ const JobDetailsPage = async ({ params }: { params: { jobId: string } }) => {
               <IconBadge icon={File} />
               <h2 className="text-xl text-neutral-700">Job Attachments</h2>
             </div>
+            <AttachmentsForm initialData={job} jobId={job.id} />
           </div>
         </div>
 

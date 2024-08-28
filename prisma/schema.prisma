@@ -32,6 +32,7 @@ model Job{
   category Category? @relation(fields: [categoryId], references: [id])
   companyId String?  @db.ObjectId
   company Company? @relation(fields: [companyId], references: [id])
+  attachments Json
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
   @@index([categoryId])
