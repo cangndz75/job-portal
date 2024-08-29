@@ -1,6 +1,5 @@
 "use client";
 import AttachmentsUploads from "@/components/attachment-uploads";
-import ImageUpload from "@/components/image-upload";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -9,18 +8,16 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Job, Attachment } from "@prisma/client";
 import axios from "axios";
-import { url } from "inspector";
-import { File, ImageIcon, Pencil, X } from "lucide-react";
-import Image from "next/image";
+import { File, Loader2, Pencil, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { z } from "zod";
+import { Job, Attachment } from "@prisma/client";
+
 interface AttachmentsFormProps {
   initialData: Job & { attachments: Attachment[] };
   jobId: string;
@@ -32,85 +29,81 @@ const formSchema = z.object({
 
 const AttachmentsForm = ({ initialData, jobId }: AttachmentsFormProps) => {
   const [isEditing, setIsEditing] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const router = useRouter();
 
-  const initialAttachments = Array.isArray(initialData?.attachments)
-    ? initialData.attachments.map((attachment: any) => {
-        if (
-          typeof attachment === "object" &&
-          attachment !== null &&
-          "url" in attachment &&
-          "name" in attachment
-        ) {
-          return { url: attachment.url, name: attachment.name };
-        }
-        return { url: "", name: "" };
-      })
-    : [];
+  const initialAttachments = initialData?.attachments.map((attachment) => ({
+    url: attachment.url,
+    name: attachment.name,
+  }));
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       attachments: initialAttachments,
     },
   });
+
   const { isSubmitting, isValid } = form.formState;
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      const response = await axios.post(
-        `/api/jobs/${jobId}/attachments`,
-        values
-      );
+      await axios.post(`/api/jobs/${jobId}/attachments`, values);
       toast.success("Job attachments updated");
-      toggleEditting();
+      setIsEditing(false);
       router.refresh();
     } catch (error) {
       toast.error("Failed to update job attachments");
     }
   };
 
-  const toggleEditting = () => setIsEditing((current) => !current);
+  const toggleEditing = () => setIsEditing((current) => !current);
+  const onDelete = async (attachment: Attachment) => {
+    try {
+      setDeletingId(attachment.id);
+      await axios.delete(`/api/jobs/${jobId}/attachments/${attachment.id}`);
+      toast.success("Attachment deleted");
+      router.refresh();
+    } catch (error) {
+      toast.error("Failed to delete attachment");
+    }
+  };
 
   return (
     <div className="mt-6 border bg-neutral-100 rounded-md p-4">
       <div className="font-medium flex items-center justify-between">
         Job Attachments
-        <Button onClick={toggleEditting} variant={"ghost"}>
-          {isEditing ? (
-            <>Cancel</>
-          ) : (
-            <>
-              <Pencil className="w-4 h-4 mr-2" /> Edit
-            </>
-          )}
+        <Button onClick={toggleEditing} variant={"ghost"}>
+          {isEditing ? <>Cancel</> : <> <Pencil className="w-4 h-4 mr-2" /> Edit </>}
         </Button>
       </div>
-      {!isEditing && <div className="space-y-2">
-        {initialData.attachments.map((item) => (
+      {!isEditing && (
+        <div className="space-y-2">
+          {initialData.attachments.map((item) => (
             <div
               className="flex items-center p-3 w-full bg-purple-100 border-purple-200 border text-purple-700 rounded-md"
               key={item.url}
             >
               <File className="w-4 h-4 mr-2" />
-              <p className="text-ws w-full truncate">{item.name} </p>
-              <Button
-                variant={"ghost"}
-                size={"icon"}
-                className="p-1"
-                onClick={() => {}}
-                type="button"
-              >
-                <X className="w-4 h-4" />
-              </Button>
+              <p className="text-ws w-full truncate">{item.name}</p>
+              {deletingId === item.id && (
+                <Button variant={"ghost"} size={"icon"} className="p-1" type="button">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                </Button>
+              )}
+              {deletingId !== item.id && (
+                <Button variant={"ghost"} size={"icon"} className="p-1" onClick={() => onDelete(item)} type="button">
+                  <X className="w-4 h-4" />
+                </Button>
+              )}
             </div>
-          ))}</div>}
+          ))}
+        </div>
+      )}
 
       {isEditing && (
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-4 mt-4"
-          >
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-4">
             <FormField
               control={form.control}
               name="attachments"
@@ -121,9 +114,7 @@ const AttachmentsForm = ({ initialData, jobId }: AttachmentsFormProps) => {
                       value={field.value}
                       disabled={isSubmitting}
                       onChange={(attachments) => {
-                        if(attachments){
-                          onSubmit({attachments});
-                        }
+                        field.onChange(attachments);
                       }}
                     />
                   </FormControl>
@@ -131,11 +122,10 @@ const AttachmentsForm = ({ initialData, jobId }: AttachmentsFormProps) => {
                 </FormItem>
               )}
             />
-            <div className="flex items-center gap-x-2">
-              <Button type="submit" disabled={!isValid || isSubmitting}>
-                Save
-              </Button>
-            </div>
+            <Button disabled={isSubmitting || !isValid}>
+              {isSubmitting && <Loader2 className="mr-2 w-4 h-4 animate-spin" />}
+              Save
+            </Button>
           </form>
         </Form>
       )}
