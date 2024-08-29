@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Job } from "@prisma/client";
+import { Job, Attachment } from "@prisma/client";
 import axios from "axios";
 import { url } from "inspector";
 import { ImageIcon, Pencil } from "lucide-react";
@@ -22,7 +22,7 @@ import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { z } from "zod";
 interface AttachmentsFormProps {
-  initialData: Job;
+  initialData: Job & {attachments: Attachment[]};
   jobId: string;
 }
 

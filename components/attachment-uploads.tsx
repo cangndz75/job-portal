@@ -7,11 +7,12 @@ import {
   ref,
   uploadBytesResumable,
 } from "firebase/storage";
-import { File, FilePlus, ImagePlus, Trash } from "lucide-react";
+import { File, FilePlus, ImagePlus, Trash, X } from "lucide-react";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Button } from "./ui/button";
+import { on } from "events";
 
 interface AttachmentsUploadsProps {
   disabled?: boolean;
@@ -68,7 +69,13 @@ const AttachmentsUploads = ({
       );
     });
 
-    const onDelete = () => {};
+    const onDelete = ({ url, name }: { url: string; name: string }) => {
+      const newValue = value.filter((data) => data.name !== name);
+      onChange(newValue);
+      deleteObject(ref(storage, url)).then(() => {
+        toast.success("Attachment deleted successfully");
+      });
+    };
 
     return (
       <div>
@@ -105,6 +112,15 @@ const AttachmentsUploads = ({
                   >
                     <File className="w-4 h-4 mr-2" />
                     <p className="text-ws w-full truncate">{item.name} </p>
+                    <Button
+                      variant={"ghost"}
+                      size={"icon"}
+                      className="p-1"
+                      onClick={() => onDelete(item)}
+                      type="button"
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
                   </div>
                 ))}
               </div>

@@ -41,6 +41,13 @@ const JobDetailsPage = async ({ params }: { params: { jobId: string } }) => {
       id: params.jobId,
       userId,
     },
+    include:{
+      attachments: {
+        orderBy:{
+          createdAt: "desc"
+        }
+      }
+    }
   });
   const categories = await db.category.findMany({
     orderBy: {
