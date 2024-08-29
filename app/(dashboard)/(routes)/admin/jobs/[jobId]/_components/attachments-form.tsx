@@ -14,7 +14,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Job, Attachment } from "@prisma/client";
 import axios from "axios";
 import { url } from "inspector";
-import { ImageIcon, Pencil } from "lucide-react";
+import { File, ImageIcon, Pencil, X } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -22,7 +22,7 @@ import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { z } from "zod";
 interface AttachmentsFormProps {
-  initialData: Job & {attachments: Attachment[]};
+  initialData: Job & { attachments: Attachment[] };
   jobId: string;
 }
 
@@ -57,7 +57,10 @@ const AttachmentsForm = ({ initialData, jobId }: AttachmentsFormProps) => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      const response = await axios.patch(`/api/jobs/${jobId}`, values);
+      const response = await axios.post(
+        `/api/jobs/${jobId}/attachments`,
+        values
+      );
       toast.success("Job attachments updated");
       toggleEditting();
       router.refresh();
@@ -82,10 +85,28 @@ const AttachmentsForm = ({ initialData, jobId }: AttachmentsFormProps) => {
           )}
         </Button>
       </div>
-      {!isEditing &&
-       <>
-       </>
-       }
+      {!isEditing && (
+        <>
+          {initialData.attachments.map((item) => (
+            <div
+              className="flex items-center p-3 w-full bg-purple-100 border-purple-200 border text-purple-700 rounded-md"
+              key={item.url}
+            >
+              <File className="w-4 h-4 mr-2" />
+              <p className="text-ws w-full truncate">{item.name} </p>
+              <Button
+                variant={"ghost"}
+                size={"icon"}
+                className="p-1"
+                onClick={() => {}}
+                type="button"
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+          ))}
+        </>
+      )}
 
       {isEditing && (
         <Form {...form}>
@@ -103,7 +124,7 @@ const AttachmentsForm = ({ initialData, jobId }: AttachmentsFormProps) => {
                       value={field.value}
                       disabled={isSubmitting}
                       onChange={(attachments) => {
-                        field.onChange(attachments.map((item) => item))
+                        field.onChange(attachments.map((item) => item));
                       }}
                       onRemove={() => field.onChange("")}
                     />
