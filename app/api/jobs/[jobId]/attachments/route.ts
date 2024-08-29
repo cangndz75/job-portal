@@ -23,6 +23,16 @@ export const POST = async(req:Request, {params}: {params:{jobId:string}}) => {
         const createdAttachments : Attachment[] = [];
         for (const attachment of attachments){
             const {url, name} = attachment;
+            const existingAttachment = await db.attachment.findFirst({
+                where:{
+                    url,
+                    name,
+                    jobId
+                }
+            });
+            if(existingAttachment){
+                continue;
+            }
             const createdAttachment = await db.attachment.create({
                 data:{
                     url,

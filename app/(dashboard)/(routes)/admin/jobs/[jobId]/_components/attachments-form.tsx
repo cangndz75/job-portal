@@ -85,9 +85,8 @@ const AttachmentsForm = ({ initialData, jobId }: AttachmentsFormProps) => {
           )}
         </Button>
       </div>
-      {!isEditing && (
-        <>
-          {initialData.attachments.map((item) => (
+      {!isEditing && <div className="space-y-2">
+        {initialData.attachments.map((item) => (
             <div
               className="flex items-center p-3 w-full bg-purple-100 border-purple-200 border text-purple-700 rounded-md"
               key={item.url}
@@ -104,9 +103,7 @@ const AttachmentsForm = ({ initialData, jobId }: AttachmentsFormProps) => {
                 <X className="w-4 h-4" />
               </Button>
             </div>
-          ))}
-        </>
-      )}
+          ))}</div>}
 
       {isEditing && (
         <Form {...form}>
@@ -124,9 +121,10 @@ const AttachmentsForm = ({ initialData, jobId }: AttachmentsFormProps) => {
                       value={field.value}
                       disabled={isSubmitting}
                       onChange={(attachments) => {
-                        field.onChange(attachments.map((item) => item));
+                        if(attachments){
+                          onSubmit({attachments});
+                        }
                       }}
-                      onRemove={() => field.onChange("")}
                     />
                   </FormControl>
                   <FormMessage />
