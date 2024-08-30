@@ -15,11 +15,10 @@ const PageContent = ({ jobs, userId }: PageContentProps) => {
       <div className="flex items-center justify-center flex-col">
         <div className="w-full h-[60vh] relative flex items-center justify-center">
           <Image
+            fill
             src={"/img/404.svg"}
             alt="Not found"
             className="w-full h-full object-contain"
-            width={500}
-            height={500}
           />
         </div>
         <h2 className="text-4xl font-semibold text-center text-muted-foreground">
