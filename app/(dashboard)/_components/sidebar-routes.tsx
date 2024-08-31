@@ -5,6 +5,9 @@ import { usePathname, useRouter } from "next/navigation";
 import SideBarRouteItem from "./side-bar-route-item";
 import Box from "@/components/box";
 import { Separator } from "@/components/ui/separator";
+import DateFilter from "./date-filter";
+import CheckBoxContainer from "./checkbox-container";
+import qs from "query-string";
 
 const adminRoutes = [
   {
@@ -47,12 +50,49 @@ const guestRoutes = [
   },
 ];
 
+const shiftTimingsData = [
+  {
+    value: "full-time",
+    label: "Full Time",
+  },
+  {
+    value: "part-time",
+    label: "Part Time",
+  },
+  {
+    value: "contract",
+    label: "Contract",
+  },
+  {
+    value: "internship",
+    label: "Internship",
+  },
+];
+
 const SidebarRoutes = () => {
   const pathname = usePathname();
   const router = useRouter();
   const isAdminPage = pathname?.startsWith("/admin");
   const isSearchPage = pathname?.startsWith("/search");
   const routes = isAdminPage ? adminRoutes : guestRoutes;
+  const handleShiftTimingChange = (shiftTimings: string) => {
+    const currentQueryParams = qs.parseUrl(window.location.href).query;
+    const updatedQueryParams = {
+      ...currentQueryParams,
+      shiftTiming: shiftTimings,
+    };
+    const url = qs.stringifyUrl(
+      {
+        url: pathname,
+        query: updatedQueryParams,
+      },
+      {
+        skipEmptyString: true,
+        skipNull: true,
+      }
+    );
+    router.push(url);
+  };
   return (
     <div className="flex flex-col w-full">
       {routes.map((route) => (
@@ -69,6 +109,15 @@ const SidebarRoutes = () => {
           <h2 className="text-lg text-muted-foreground tracking-wide">
             Filters
           </h2>
+          <DateFilter />
+          <Separator />
+          <h2 className="text-lg text-muted-foreground tracking-wide">
+            Working Schedule
+          </h2>
+          <CheckBoxContainer
+            data={shiftTimingsData}
+            onChange={handleShiftTimingChange}
+          />
         </Box>
       )}
     </div>

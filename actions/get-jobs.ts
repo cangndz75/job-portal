@@ -42,7 +42,43 @@ export const getJobs = async({title, categoryId,createdAtFilter, shiftTiming, wo
                             equals:categoryId
                         }
                     }
-                ]
+                ].filter(Boolean)
+            }
+        }
+        if(createdAtFilter){
+            const currentDate = new Date();
+            let startDate: Date;
+            switch (createdAtFilter) {
+                case "today":
+                    startDate = new Date(currentDate);
+                    break;
+                case "yesterday":
+                    startDate = new Date(currentDate);
+                    startDate.setDate(startDate.getDate() - 1);
+                    break;
+                case "this-week":
+                    startDate = new Date(currentDate);
+                    startDate.setDate(startDate.getDate() - 7);
+                    break;
+                case "last-week":
+                    startDate = new Date(currentDate);
+                    startDate.setDate(startDate.getDate() - 14);
+                    break;
+                case "this-month":
+                    startDate = new Date(currentDate);
+                    startDate.setMonth(startDate.getMonth() - 1);
+                    break;
+                    default:
+                    startDate = new Date(currentDate);
+            }
+            query.where.createdAt = {
+                gte:startDate
+            }
+        }
+        let formattedShiftTiming = shiftTiming?.split(",");
+        if(formattedShiftTiming && formattedShiftTiming.length > 0){
+            query.where.shiftTiming = {
+                in:formattedShiftTiming
             }
         }
         const jobs = await db.job.findMany(query);
