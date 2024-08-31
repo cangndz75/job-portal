@@ -20,22 +20,22 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { z } from "zod";
-interface NameFormProps {
+interface EmailFormProps {
   initialData: UserProfile | null;
   userId: string;
 }
 
 const formSchema = z.object({
-  fullName: z.string().min(1, { message: "Full name is required" }),
+  email: z.string().min(1, { message: "Email is required" }),
 });
 
-const NameForm = ({ initialData, userId }: NameFormProps) => {
+const EmailForm = ({ initialData, userId }: EmailFormProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      fullName: initialData?.fullName || "",
+      email: initialData?.email || "",
     },
   });
   const { isSubmitting, isValid } = form.formState;
@@ -43,11 +43,11 @@ const NameForm = ({ initialData, userId }: NameFormProps) => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       const response = await axios.patch(`/api/users/${userId}`, values);
-      toast.success("Full name updated");
+      toast.success("Email updated");
       toggleEditting();
       router.refresh();
     } catch (error) {
-      toast.error("Failed to update full name");
+      toast.error("Failed to update email");
     }
   };
 
@@ -59,11 +59,11 @@ const NameForm = ({ initialData, userId }: NameFormProps) => {
         <div
           className={cn(
             "text-lg mt-2 flex items-center gap-2",
-            !initialData?.fullName && "text-neutral-500 italic"
+            !initialData?.email && "text-neutral-500 italic"
           )}
         >
           <UserCircle className="w-4 h-4 mr-2" />
-          {initialData?.fullName ? initialData.fullName : "No full name"}
+          {initialData?.email ? initialData.email : "No email"}
         </div>
       )}
       {isEditing && (
@@ -74,14 +74,15 @@ const NameForm = ({ initialData, userId }: NameFormProps) => {
           >
             <FormField
               control={form.control}
-              name="fullName"
+              name="email"
               render={({ field }) => (
                 <FormItem className="w-full">
                   <FormControl>
                     <Input
                       disabled={isSubmitting}
-                      placeholder="Your full name"
+                      placeholder="Your email"
                       {...field}
+                      type="email"
                     />
                   </FormControl>
                   <FormMessage />
@@ -109,4 +110,4 @@ const NameForm = ({ initialData, userId }: NameFormProps) => {
   );
 };
 
-export default NameForm;
+export default EmailForm;
