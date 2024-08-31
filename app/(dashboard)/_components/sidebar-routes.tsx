@@ -41,7 +41,7 @@ const guestRoutes = [
   {
     icon: User,
     label: "Profile",
-    href: "/profile",
+    href: "/user",
   },
   {
     icon: BookMarked,
