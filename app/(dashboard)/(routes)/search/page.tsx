@@ -13,7 +13,7 @@ interface SearchProps {
     createdAtFilter: string;
     shiftTiming: string;
     workMode: string;
-    yearsofExperience: string;
+    yearsOfExperience: string;
   };
 }
 

@@ -69,12 +69,46 @@ const shiftTimingsData = [
   },
 ];
 
+const workingModesData = [
+  {
+    value: "remote",
+    label: "Remote",
+  },
+  {
+    value: "hybrid",
+    label: "Hybrid",
+  },
+  {
+    value: "office",
+    label: "Office",
+  }
+]
+
+const experienceData =[
+  {
+    value: "0",
+    label: "Fresher",
+  },
+  {
+    value: "2",
+    label: "0-2 years",
+  },
+  {
+    value: "3",
+    label: "2-4 years",
+  },
+  {
+    value: "5",
+    label: "5+ years",
+  },
+]
 const SidebarRoutes = () => {
   const pathname = usePathname();
   const router = useRouter();
   const isAdminPage = pathname?.startsWith("/admin");
   const isSearchPage = pathname?.startsWith("/search");
   const routes = isAdminPage ? adminRoutes : guestRoutes;
+  
   const handleShiftTimingChange = (shiftTimings: string) => {
     const currentQueryParams = qs.parseUrl(window.location.href).query;
     const updatedQueryParams = {
@@ -89,6 +123,46 @@ const SidebarRoutes = () => {
       {
         skipEmptyString: true,
         skipNull: true,
+      }
+    );
+    router.push(url);
+  };
+  
+  const handleWorkingModes = (workingModes: string) => {
+    const currentQueryParams = qs.parseUrl(window.location.href).query;
+    const updatedQueryParams = {
+      ...currentQueryParams,
+      workMode: workingModes,
+    };
+    const url = qs.stringifyUrl(
+      {
+        url: pathname,
+        query: updatedQueryParams,
+      },
+      {
+        skipEmptyString: true,
+        skipNull: true,
+        arrayFormat: "comma",
+      }
+    );
+    router.push(url);
+  };
+
+  const handleExperiences = (experience: string) => {
+    const currentQueryParams = qs.parseUrl(window.location.href).query;
+    const updatedQueryParams = {
+      ...currentQueryParams,
+      yearsOfExperience: experience,
+    };
+    const url = qs.stringifyUrl(
+      {
+        url: pathname,
+        query: updatedQueryParams,
+      },
+      {
+        skipEmptyString: true,
+        skipNull: true,
+        arrayFormat: "comma",
       }
     );
     router.push(url);
@@ -117,6 +191,22 @@ const SidebarRoutes = () => {
           <CheckBoxContainer
             data={shiftTimingsData}
             onChange={handleShiftTimingChange}
+          />
+          <Separator />
+          <h2 className="text-lg text-muted-foreground tracking-wide">
+            Work Mode
+          </h2>
+          <CheckBoxContainer
+            data={workingModesData}
+            onChange={handleWorkingModes}
+          />
+          <Separator />
+          <h2 className="text-lg text-muted-foreground tracking-wide">
+            Experience
+          </h2>
+          <CheckBoxContainer
+            data={experienceData}
+            onChange={handleExperiences}
           />
         </Box>
       )}

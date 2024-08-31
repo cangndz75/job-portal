@@ -8,11 +8,11 @@ type GetJobs = {
     createdAtFilter?: string;
     shiftTiming?: string;
     workMode?: string;
-    yearsofExperience?: string;
+    yearsOfExperience?: string;
     savedJobs?: boolean;
 };
 
-export const getJobs = async({title, categoryId,createdAtFilter, shiftTiming, workMode, yearsofExperience, savedJobs}:GetJobs): Promise<Job[]> => {
+export const getJobs = async({title, categoryId,createdAtFilter, shiftTiming, workMode, yearsOfExperience, savedJobs}:GetJobs): Promise<Job[]> => {
     const {userId} = auth();
     try {
         let query : any = {
@@ -79,6 +79,18 @@ export const getJobs = async({title, categoryId,createdAtFilter, shiftTiming, wo
         if(formattedShiftTiming && formattedShiftTiming.length > 0){
             query.where.shiftTiming = {
                 in:formattedShiftTiming
+            }
+        }
+        let formattedWorkingModes = workMode?.split(",");
+        if(formattedWorkingModes && formattedWorkingModes.length > 0){
+            query.where.workMode = {
+                in:formattedWorkingModes
+            }
+        }
+        let formattedExperiences = yearsOfExperience?.split(",");
+        if(formattedExperiences && formattedExperiences.length > 0){
+            query.where.yearsOfExperience = {
+                in:formattedExperiences
             }
         }
         const jobs = await db.job.findMany(query);
