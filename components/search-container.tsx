@@ -1,12 +1,50 @@
 "use client";
 
 import { Search, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useDebounce } from "@/hooks/use-debounce";
+import qs from "query-string";
 
 const SearchContainer = () => {
-  const [value, setValue] = useState("");
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+  const currentCategoryId = searchParams.get("categoryId");
+  const currentTitle = searchParams.get("title");
+  const createdAtFilter = searchParams.get("createdAt");
+  const currentShiftTiminig = searchParams.get("shiftTiming");
+  const currentWorkMode = searchParams.get("workMode");
+
+  const [value, setValue] = useState(currentTitle || "");
+  const debouncedValue = useDebounce(value, 500);
+  useEffect(() => {
+    const url = qs.stringifyUrl(
+      {
+        url: pathname,
+        query: {
+          title: debouncedValue,
+          categoryId: currentCategoryId,
+          createdAtFilter: createdAtFilter,
+          shiftTiming: currentShiftTiminig,
+          workMode: currentWorkMode,
+        },
+      },
+      {
+        skipNull: true,
+        skipEmptyString: true,
+      }
+    );
+    router.push(url);
+  }, [
+    debouncedValue,
+    currentCategoryId,
+    createdAtFilter,
+    currentShiftTiminig,
+    currentWorkMode,
+  ]);
   return (
     <>
       <div className="flex items-center gap-x-2 relative flex-1">

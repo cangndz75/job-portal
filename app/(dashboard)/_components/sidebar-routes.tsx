@@ -3,6 +3,8 @@ import React from "react";
 import { BookMarked, Compass, Home, List, User } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import SideBarRouteItem from "./side-bar-route-item";
+import Box from "@/components/box";
+import { Separator } from "@/components/ui/separator";
 
 const adminRoutes = [
   {
@@ -49,6 +51,7 @@ const SidebarRoutes = () => {
   const pathname = usePathname();
   const router = useRouter();
   const isAdminPage = pathname?.startsWith("/admin");
+  const isSearchPage = pathname?.startsWith("/search");
   const routes = isAdminPage ? adminRoutes : guestRoutes;
   return (
     <div className="flex flex-col w-full">
@@ -60,6 +63,14 @@ const SidebarRoutes = () => {
           label={route.label}
         />
       ))}
+      {isSearchPage && (
+        <Box className="px-4 py-4 items-start justify-start space-y-4 flex-col">
+          <Separator />
+          <h2 className="text-lg text-muted-foreground tracking-wide">
+            Filters
+          </h2>
+        </Box>
+      )}
     </div>
   );
 };

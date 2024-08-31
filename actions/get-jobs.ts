@@ -28,7 +28,23 @@ export const getJobs = async({title, categoryId,createdAtFilter, shiftTiming, wo
                 createdAt:"desc"
             },
         };
-
+        if(typeof title !== "undefined" || typeof categoryId !== "undefined"){
+            query.where ={
+                AND:[
+                    typeof title !=="undefined" && {
+                        title:{
+                            contains:title,
+                            mode:"insensitive"
+                        }
+                    },
+                    typeof categoryId !=="undefined" && {
+                        categoryId:{
+                            equals:categoryId
+                        }
+                    }
+                ]
+            }
+        }
         const jobs = await db.job.findMany(query);
         return jobs;
     } catch (error) {
