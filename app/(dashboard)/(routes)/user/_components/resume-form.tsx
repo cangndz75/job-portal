@@ -10,16 +10,18 @@ import {
 } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
-import { File, Loader2, Pencil, X } from "lucide-react";
+import { File, Loader2, Pencil, ShieldCheck, ShieldX, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { z } from "zod";
 import { Job, Attachment, UserProfile, Resumes } from "@prisma/client";
+import { cn } from "@/lib/utils";
+import { set } from "lodash";
 
 interface ResumeFormProps {
-  initialData: UserProfile & { resumes: Resumes[] };
+  initialData: (UserProfile & { resumes: Resumes[] }) | null;
   userId: string;
 }
 
@@ -30,6 +32,7 @@ const formSchema = z.object({
 const ResumeForm = ({ initialData, userId }: ResumeFormProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [isActiveResumeId, setIsActiveResumeId] = useState<string | null>(null);
   const router = useRouter();
 
   const initialResumes = Array.isArray(initialData?.resumes)
@@ -68,11 +71,33 @@ const ResumeForm = ({ initialData, userId }: ResumeFormProps) => {
   const onDelete = async (resume: Resumes) => {
     try {
       setDeletingId(resume.id);
+      if (initialData?.activeResumeId === resume.id) {
+        toast.error("Cannot delete active resume");
+        return;
+      }
       await axios.delete(`/api/users/${userId}/resumes/${resume.id}`);
       toast.success("Resume deleted");
       router.refresh();
     } catch (error) {
       toast.error("Failed to delete resume");
+    }finally{
+      setDeletingId(null);
+    }
+  };
+
+  const setActiveResumeId = async (resumeId: string) => {
+    setIsActiveResumeId(resumeId);
+    const response = await axios.patch(`/api/users/${userId}`, {
+      activeResumeId: resumeId,
+    });
+    toast.success("Resume set active");
+    router.refresh();
+    try {
+    } catch (error) {
+      toast.error("Failed to set active");
+      console.log((error as Error)?.message);
+    } finally {
+      setIsActiveResumeId(null);
     }
   };
 
@@ -94,33 +119,68 @@ const ResumeForm = ({ initialData, userId }: ResumeFormProps) => {
       {!isEditing && (
         <div className="space-y-2">
           {initialData?.resumes.map((item) => (
-            <div
-              className="flex items-center p-3 w-full bg-purple-100 border-purple-200 border text-purple-700 rounded-md"
-              key={item.url}
-            >
-              <File className="w-4 h-4 mr-2" />
-              <p className="text-ws w-full truncate">{item.name}</p>
-              {deletingId === item.id && (
-                <Button
-                  variant={"ghost"}
-                  size={"icon"}
-                  className="p-1"
-                  type="button"
-                >
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                </Button>
-              )}
-              {deletingId !== item.id && (
-                <Button
-                  variant={"ghost"}
-                  size={"icon"}
-                  className="p-1"
-                  onClick={() => onDelete(item)}
-                  type="button"
-                >
-                  <X className="w-4 h-4" />
-                </Button>
-              )}
+            <div className="grid grid-cols-12 gap-2">
+              <div
+                className="flex items-center p-3 w-full bg-purple-100 border-purple-200 border text-purple-700 rounded-md col-span-10"
+                key={item.url}
+              >
+                <File className="w-4 h-4 mr-2" />
+                <p className="text-ws w-full truncate">{item.name}</p>
+                {deletingId === item.id && (
+                  <Button
+                    variant={"ghost"}
+                    size={"icon"}
+                    className="p-1"
+                    type="button"
+                  >
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  </Button>
+                )}
+                {deletingId !== item.id && (
+                  <Button
+                    variant={"ghost"}
+                    size={"icon"}
+                    className="p-1"
+                    onClick={() => onDelete(item)}
+                    type="button"
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                )}
+              </div>
+              <div className="col-span-2 flex items-center justify-start gap-2">
+                {isActiveResumeId === item.id ? (
+                  <>
+                    <div className="flex items-center justify-center w-full">
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <Button
+                      variant={"ghost"}
+                      className={cn(
+                        "flex items-center justify-center",
+                        initialData.activeResumeId === item.id
+                          ? "text-emerald-500"
+                          : "text-red-500"
+                      )}
+                      onClick={() => setActiveResumeId(item.id)}
+                    >
+                      <p>
+                        {initialData.activeResumeId === item.id
+                          ? "Live"
+                          : "Activate"}
+                      </p>
+                      {initialData.activeResumeId === item.id ? (
+                        <ShieldCheck className="w-4 h-4 ml-2" />
+                      ) : (
+                        <ShieldX className="w-4 h-4 ml-2" />
+                      )}
+                    </Button>
+                  </>
+                )}
+              </div>
             </div>
           ))}
         </div>
